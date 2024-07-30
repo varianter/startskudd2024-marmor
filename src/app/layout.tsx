@@ -3,6 +3,7 @@ import { Inter as FontSans } from "next/font/google";
 
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import PageHeader from "./page-header";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -27,7 +28,11 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
-        {children}
+        <div className="flex min-h-screen w-full flex-col">
+          <PageHeader />
+
+          {children}
+        </div>
       </body>
     </html>
   );
