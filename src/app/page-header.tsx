@@ -1,4 +1,4 @@
-import { CircleUser, Menu, MountainIcon } from "lucide-react";
+import { CircleUser, Menu, MountainSnowIcon } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,7 @@ export default function PageHeader() {
           href="#"
           className="flex items-center gap-2 text-lg font-semibold md:text-base"
         >
-          <MountainIcon className="h-6 w-6" />
+          <MountainSnowIcon className="h-6 w-6" />
           <span className="sr-only">Rockslide Detection Dashboard</span>
         </Link>
         <Links />
@@ -38,7 +38,7 @@ export default function PageHeader() {
               href="#"
               className="flex items-center gap-2 text-lg font-semibold"
             >
-              <MountainIcon className="h-6 w-6" />
+              <MountainSnowIcon className="h-6 w-6" />
               <span className="sr-only">Rockslide Detection Dashboard</span>
             </Link>
             <Links />

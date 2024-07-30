@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Dashboard() {
@@ -12,7 +12,6 @@ export default function Dashboard() {
           <CardContent className="grid gap-8">
             <div className="flex items-center gap-4">
               <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="/avatars/01.png" alt="Avatar" />
                 <AvatarFallback>AG</AvatarFallback>
               </Avatar>
               <div className="grid gap-1">
@@ -32,7 +31,6 @@ export default function Dashboard() {
             </div>
             <div className="flex items-center gap-4">
               <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="/avatars/01.png" alt="Avatar" />
                 <AvatarFallback>GØ</AvatarFallback>
               </Avatar>
               <div className="grid gap-1">
