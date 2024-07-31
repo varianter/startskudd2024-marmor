@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Typography from "@/components/ui/typography";
 import { connect, getConnectionInfo } from "@/elastic";
 
+export const revalidate = 20;
+
 export default async function Dashboard() {
   const client = await connect();
   const connectionData = await getConnectionInfo();
