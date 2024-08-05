@@ -26,3 +26,70 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 - [ElasticSearch JS Client](https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/client-connecting.html)
 - [Tailwind](https://tailwindcss.com/docs/border-radius)
 - [shadcn/ui](https://ui.shadcn.com/)
+
+
+
+## Data schema
+
+The following schema/index mapping is used for storing sensor data.
+
+```json
+{
+  "mappings": {
+    "properties": {
+      "deltaMovementInMm": {
+        "type": "float"
+      },
+      "readingDate": {
+        "type": "date"
+      },
+      "readingPlacement": {
+        "properties": {
+          "depthInMeter": {
+            "type": "float"
+          },
+          "x": {
+            "type": "long"
+          },
+          "y": {
+            "type": "long"
+          }
+        }
+      },
+      "sensor": {
+        "type": "nested",
+        "properties": {
+          "id": {
+            "type": "keyword"
+          },
+          "placement": {
+            "properties": {
+              "depthInMeter": {
+                "type": "float"
+              },
+              "x": {
+                "type": "long"
+              },
+              "y": {
+                "type": "long"
+              }
+            }
+          }
+        }
+      },
+      "sensorId": {
+        "type": "keyword"
+      },
+      "status": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      }
+    }
+  }
+}
+```
