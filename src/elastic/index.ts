@@ -13,6 +13,7 @@ export async function getConnectionInfo(): Promise<ConnectionInfoReturn> {
   try {
     const client = await connect();
     const data = await client.info();
+    console.log(data)
     return {
       connected: true,
       clusterName: data.cluster_name,

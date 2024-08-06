@@ -1,9 +1,12 @@
+
 import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
+
 
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import PageHeader from "./page-header";
+import { Notif } from "@/components/ui/notif";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -16,6 +19,8 @@ export const metadata: Metadata = {
     "Rock Displacement Dashboard. A dashboard for monitoring rockslide detection systems.",
   icons: {},
 };
+
+
 
 export default function RootLayout({
   children,
@@ -31,6 +36,7 @@ export default function RootLayout({
         )}
       >
         <div className="flex min-h-screen w-full flex-col">
+        <Notif/>
           <PageHeader />
 
           {children}
