@@ -61,6 +61,7 @@ export default async function Dashboard() {
     
 
     const sensorStatus = await client.search({
+        size:0,
         index:"sensor_readings",
         "aggs": {
             "latest": {
