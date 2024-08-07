@@ -1,6 +1,6 @@
 import {Card, CardContent, CardTitle} from "@/components/ui/card";
 import Typography from "@/components/ui/typography";
-import { connect, getConnectionInfo } from "@/elastic";
+import { connect } from "@/elastic";
 import { TriangleAlert } from 'lucide-react';
 
 export const revalidate = 20;
@@ -12,11 +12,7 @@ const RISK_DISPLACEMENTS_COUNT_THRESHOLD = 10;
 
 
 export default async function Dashboard() {
-  const client = await connect();
-  const connectionData = await getConnectionInfo();
-  const numberOfDocuments = connectionData.connected
-    ? await client.count()
-    : null;
+    const client = await connect();
 
     const sensorDangerSearch = await client.search({
         index: "sensor_readings",
@@ -74,31 +70,6 @@ export default async function Dashboard() {
         <Typography variant="h1">Dashboard</Typography>
 
         <div className="grid gap-4 md:gap-8 lg:grid-cols-2">
-            {/*<Card x-chunk="dashboard-01-chunk-5">*/}
-            {/*    <CardHeader>*/}
-            {/*        <CardTitle className="gap-2 flex">*/}
-            {/*            Connection status*/}
-            {/*            {connectionData.connected ? (*/}
-            {/*                <Badge variant="default">Connected</Badge>*/}
-            {/*            ) : (*/}
-            {/*                <Badge variant="destructive">Not connected</Badge>*/}
-            {/*            )}*/}
-            {/*        </CardTitle>*/}
-            {/*    </CardHeader>*/}
-            {/*    <CardContent className="grid gap-8">*/}
-            {/*        {connectionData.connected ? (*/}
-            {/*            <p>*/}
-            {/*                Connected to cluster{" "}*/}
-            {/*                <code className="bg-slate-200 p-1 font-mono rounded-sm">*/}
-            {/*                    {connectionData.clusterName}*/}
-            {/*                </code>*/}
-            {/*                . Counting {numberOfDocuments?.count} documents*/}
-            {/*            </p>*/}
-            {/*        ) : (*/}
-            {/*            <p>Not connected</p>*/}
-            {/*        )}*/}
-            {/*    </CardContent>*/}
-            {/*</Card>*/}
             <Card className={sensorIsDanger ? "border-red-600 border-4" : ""}>
                 <CardContent>
                     <div className={"flex flex-row mt-5 gap-5"}>
