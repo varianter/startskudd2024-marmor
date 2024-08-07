@@ -11,6 +11,7 @@ import {
     TableHeader,
     TableRow,
   } from "@/components/ui/table"
+import RiskNotification from "@/app/dashboard/RiskNotification";
 
 export const revalidate = 20;
 
@@ -102,6 +103,9 @@ export default async function Dashboard() {
 
 
     return <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+
+        <RiskNotification isDanger={sensorIsDanger} />
+
         <Typography variant="h1">Dashboard</Typography>
 
         <div className="grid gap-4 md:gap-8 lg:grid-cols-2">
