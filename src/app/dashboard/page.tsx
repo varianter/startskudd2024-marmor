@@ -3,6 +3,15 @@ import Typography from "@/components/ui/typography";
 import { connect } from "@/elastic";
 import { TriangleAlert } from 'lucide-react';
 
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+  } from "@/components/ui/table"
+
 export const revalidate = 20;
 
 
@@ -51,6 +60,47 @@ export default async function Dashboard() {
     const sensorTotalCount = 20;  // TODO
     const sensorOkCount = 18;  // TODO (number of sensors with status='ON')
 
+    const sensorStatus = await client.search({
+        size:0,
+        index:"sensor_readings",
+        "aggs": {
+            "latest": {
+                "terms": {
+                    "size":100,
+                    "field": "sensorId",
+
+                },
+                "aggs": {
+                    "latest": {
+                        "top_hits": {
+                            "sort": {
+                                "readingDate":"desc",
+                            },
+                            "size": 1
+                        }
+
+                    }
+                }
+            }
+        }
+    })
+
+    // @ts-ignore
+    const sensors = sensorStatus.aggregations?.["latest"]["buckets"]
+
+    // @ts-ignore
+    function sortSensorsById(sensorList:any) {
+        return sensorList.sort((a, b) => {
+            const sensorIdA = parseInt(a.key.split('-')[1], 10);
+            const sensorIdB = parseInt(b.key.split('-')[1], 10);
+            return sensorIdA - sensorIdB;
+        });
+    }
+    const sortedBuckets = sortSensorsById(sensors)
+    // @ts-ignore
+    const sensorDangerCount = sensorDangerSearch.aggregations?.["sensors"]["buckets"].length
+
+
     return <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
         <Typography variant="h1">Dashboard</Typography>
 
@@ -76,6 +126,34 @@ export default async function Dashboard() {
                     {/*</code> sensor{sensorDangerCount == 1 ? "" : "s"} detecting significant displacement</p>*/}
                 </CardContent>
             </Card>
+            <div><div className="text-base">Oversikt sensorer</div>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead className="w-[100px] tableHeadFont">Sensornavn</TableHead>
+                            <TableHead className="tableHeadFont">Status</TableHead>
+                            <TableHead className="tableHeadFont" >Siste måling (mm)</TableHead>
+                            {/* <TableHead>Posisjon(x,y,z)</TableHead> */}
+                            <TableHead className="tableHeadFont">Sist søk</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {sortedBuckets.map((sensor:any) => {
+                            let sensorInfo = sensor["latest"]["hits"]["hits"][0]["_source"]
+                            let placement = sensorInfo["sensor"]["placement"]
+                            let date = new Date(sensorInfo["readingDate"])
+                            return <TableRow key={sensor["key"]}>
+                                <TableCell>{sensor["key"]}</TableCell>
+                                <TableCell>{sensorInfo["status"]}</TableCell>
+                                <TableCell>{sensorInfo["status"] == "ON" ? Number((sensorInfo["deltaMovementInMm"]).toFixed(2)): "-"}</TableCell>
+                                {/* <TableCell>({placement["x"]},{placement["y"]},{placement["depthInMeter"]})</TableCell> */}
+                                <TableCell>{date.toUTCString()}</TableCell>
+                            </TableRow>
+                        })}
+
+                    </TableBody>
+                </Table>
+            </div>
         </div>
     </main>;
 }

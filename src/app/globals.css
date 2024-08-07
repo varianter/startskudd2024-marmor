@@ -67,3 +67,11 @@
     @apply bg-background text-foreground;
   }
 }
+
+.tableHeadFont {
+  font-size: 0.9rem; /* 14px */
+line-height: 1.25rem; /* 20px */
+font-weight: 700;
+color: rgb(15 23 42);
+
+}
