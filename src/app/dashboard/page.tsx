@@ -20,6 +20,7 @@ import {Badge} from "@/components/ui/badge";
 import {QueryClient, useQuery} from "@tanstack/react-query";
 
 const RISK_DISPLACEMENTS_COUNT_THRESHOLD = 10;
+const REFETCH_INTERVAL = 1000;
 
 const queryClient = new QueryClient();
 
@@ -28,11 +29,11 @@ export default function Dashboard() {
 
     const [sensorIndex, setSensorIndex] = useState<string>("sensor_readings");
 
-    const sensorDangerQuery = useQuery({queryKey: ["sensorDanger", sensorIndex], refetchInterval: 1000, queryFn: ({queryKey}) => {
+    const sensorDangerQuery = useQuery({queryKey: ["sensorDanger", sensorIndex], refetchInterval: REFETCH_INTERVAL, queryFn: ({queryKey}) => {
         return doSensorDangerSearch(queryKey[1])
     }}, queryClient)
 
-    const sensorStatusQuery = useQuery({queryKey: ["sensorStatus", sensorIndex], refetchInterval: 1000, queryFn: ({queryKey}) => {
+    const sensorStatusQuery = useQuery({queryKey: ["sensorStatus", sensorIndex], refetchInterval: REFETCH_INTERVAL, queryFn: ({queryKey}) => {
             return doSensorStatusSearch(queryKey[1])
         }}, queryClient)
 
@@ -76,14 +77,18 @@ export default function Dashboard() {
                             <CardTitle className={"text-3xl"}>
                                 <p>{sensorIsDanger ? "Rasfare" : "Ingen rasfare"}</p>
                             </CardTitle>
-                            <p>Dette er basert på data innhentet fra <strong>{sensorOkCount} av {sensorTotalCount}</strong> sensorer.</p>
+                            {sensorIsDanger ? (
+                                <p>Det er registrert <strong>{sensorDisplacementCount}</strong> målinger over terskelverdi. Målingene er hentet fra <strong>{sensorOkCount} av {sensorTotalCount}</strong> sensorer.</p>
+                            ): (
+                                <p>Dette er basert på målinger innhentet fra <strong>{sensorOkCount} av {sensorTotalCount}</strong> sensorer.</p>
+                            )}
                         </div>
                     </div>
                 </CardContent>
             </Card>
             <div></div>
             <div>
-                <div className="text-2xl text-extrabold bold ">Oversikt sensorer</div>
+                <div className="text-2xl text-extrabold bold pb-5">Oversikt sensorer</div>
                 <Table className="border">
                     <TableHeader>
                         <TableRow>
