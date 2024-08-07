@@ -90,7 +90,7 @@ export default async function Dashboard() {
 
     // @ts-ignore
     function sortSensorsById(sensorList:any) {
-        return sensorList.sort((a, b) => {
+        return sensorList.sort((a:any, b:any) => {
             const sensorIdA = parseInt(a.key.split('-')[1], 10);
             const sensorIdB = parseInt(b.key.split('-')[1], 10);
             return sensorIdA - sensorIdB;
@@ -126,6 +126,7 @@ export default async function Dashboard() {
                     {/*</code> sensor{sensorDangerCount == 1 ? "" : "s"} detecting significant displacement</p>*/}
                 </CardContent>
             </Card>
+            <div></div>
             <div><div className="text-base">Oversikt sensorer</div>
                 <Table>
                     <TableHeader>
