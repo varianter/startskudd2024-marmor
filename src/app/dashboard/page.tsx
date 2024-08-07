@@ -46,14 +46,15 @@ export default function Dashboard() {
     // @ts-ignore
     const sensorOkCount = sensors?.filter(elem => elem["latest"]["hits"]["hits"][0]["_source"]["status"]=="ON").length ?? 0;
 
+    function sensorDistanceFromOrigo(s: any) {
+        const pos = s["latest"]["hits"]["hits"][0]["_source"]["sensor"]["placement"]
+        return (pos["x"]**2 + pos["y"]**2)**0.5;
+    }
+
     // @ts-ignore
     function sortSensorsById(sensorList:any) {
         if (!sensorList) return sensorList;
-        return sensorList.sort((a:any, b:any) => {
-            const sensorIdA = parseInt(a.key.split('-')[1], 10);
-            const sensorIdB = parseInt(b.key.split('-')[1], 10);
-            return sensorIdA - sensorIdB;
-        });
+        return sensorList.sort((a:any, b:any) => sensorDistanceFromOrigo(a) - sensorDistanceFromOrigo(b));
     }
     const sortedBuckets = sortSensorsById(sensors)
 
