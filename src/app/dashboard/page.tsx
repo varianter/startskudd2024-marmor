@@ -87,11 +87,11 @@ export default function Dashboard() {
                 <Table className="border">
                     <TableHeader>
                         <TableRow>
-                            <TableHead className=" border w-[100px] text-right tableHeadFont mr-6">Sensornavn</TableHead>
-                            <TableHead className=" border tableHeadFont pr-3 w-1/6 pl-20">Status</TableHead>
-                            <TableHead className=" border tableHeadFont text-right pl-0 ml-0 " >Posisjonsendring (mm)</TableHead>
+                            <TableHead className=" border  tableHeadFont mr-6 w-1/4" >Sensornavn</TableHead>
+                            <TableHead className=" border text-left marginauto tableHeadFont pr-3 w-1/6">Status</TableHead>
+                            <TableHead className=" border tableHeadFont text-right pl-0 ml-0 w-2/6" >Posisjonsendring (mm)</TableHead>
                             {/* <TableHead>Posisjon(x,y,z)</TableHead> */}
-                            <TableHead className=" border tableHeadFont text-right">Sist søk</TableHead>
+                            <TableHead className=" border tableHeadFont text-right w-2/6">Sist søk</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -100,16 +100,16 @@ export default function Dashboard() {
                             let placement = sensorInfo["sensor"]["placement"]
                             let date = new Date(sensorInfo["readingDate"])
                             let change = Number((sensorInfo["deltaMovementInMm"])).toFixed(3)
-                            change = change.replace(/\./g, ',')
-                            return <TableRow key={sensor["key"]}>
-                                <TableCell className=" border text-right">{sensor["key"]}</TableCell>
-                                <TableCell className="right flex items-stretch"><div className="marginauto text-right text-right flex items-stretch">{sensorInfo["status"]}<div
-                                className={`text-right me-1 mt-5px ml-2 rounded-full h-2.5 w-2.5 flex  ${(sensorInfo["status"] == "ON" ? 'bg-emerald-400' : (sensorInfo["status"] == "ERROR" ? 'bg-red-600' : 'bg-slate-300' ))}`}>
-                            </div></div>
+                            let changeComma = change.replace(/\./g, ',')
+                            return <TableRow className={`${ Number(change)>5 ?'bg-red-100' : ''}`} key={sensor["key"]}>
+                                <TableCell className=" border">{sensor["key"]}</TableCell>
+                                <TableCell className="flex items-stretch"><div className="flex items-stretch"><div
+                                className={`text-right me-1 mt-5px mr-2 rounded-full h-2.5 w-2.5 flex  ${(sensorInfo["status"] == "ON" ? 'bg-emerald-400' : (sensorInfo["status"] == "ERROR" ? 'bg-red-600' : 'bg-slate-300' ))}`}>
+                            </div>{sensorInfo["status"]}</div>
                             </TableCell>
-                                <TableCell className=" border text-right pl-0 ml-0">{sensorInfo["status"] == "ON" ? change : "-"}</TableCell>
+                                <TableCell className=" border text-right pl-0 ml-0">{sensorInfo["status"] == "ON" ? changeComma : "-"}</TableCell>
                                 {/* <TableCell>({placement["x"]},{placement["y"]},{placement["depthInMeter"]})</TableCell> */}
-                                <TableCell className="border text-right">{date.toLocaleDateString("nb-NO")} kl.{date.toLocaleTimeString("nb-NO")}</TableCell>
+                                <TableCell className="border text-right">{date.toLocaleTimeString("nb-NO")}</TableCell>
                             </TableRow>
                         })}
                     </TableBody>
