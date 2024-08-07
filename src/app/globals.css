@@ -79,3 +79,11 @@ color: rgb(15 23 42);
 .mt-5px {
   margin-top: 5px;
 }
+
+.bold {
+  font-weight: 700;
+}
+
+.marginauto {
+  margin-left:auto;
+}

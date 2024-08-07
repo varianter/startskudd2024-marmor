@@ -85,6 +85,12 @@ export default async function Dashboard() {
         }
     })
 
+    const errorSensors = await client.search({
+        size:0,
+        index: "sensor_readings",
+
+    })
+
     // @ts-ignore
     const sensors = sensorStatus.aggregations?.["latest"]["buckets"]
     const sensorTotalCount = sensors.length;
@@ -133,15 +139,15 @@ export default async function Dashboard() {
             </Card>
             <div></div>
             <div>
-                <div className="text-base">Oversikt sensorer</div>
-                <Table>
+                <div className="text-2xl text-extrabold bold ">Oversikt sensorer</div>
+                <Table className="border">
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[100px] tableHeadFont">Sensornavn</TableHead>
-                            <TableHead className="tableHeadFont">Status</TableHead>
-                            <TableHead className="tableHeadFont" >Posisjonsendring (mm)</TableHead>
+                            <TableHead className=" border w-[100px] text-right tableHeadFont mr-6">Sensornavn</TableHead>
+                            <TableHead className=" border tableHeadFont pr-3 w-1/6 pl-20">Status</TableHead>
+                            <TableHead className=" border tableHeadFont text-right pl-0 ml-0 " >Posisjonsendring (mm)</TableHead>
                             {/* <TableHead>Posisjon(x,y,z)</TableHead> */}
-                            <TableHead className="tableHeadFont">Sist søk</TableHead>
+                            <TableHead className=" border tableHeadFont text-right">Sist søk</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -149,14 +155,17 @@ export default async function Dashboard() {
                             let sensorInfo = sensor["latest"]["hits"]["hits"][0]["_source"]
                             let placement = sensorInfo["sensor"]["placement"]
                             let date = new Date(sensorInfo["readingDate"])
+                            let change = Number((sensorInfo["deltaMovementInMm"])).toFixed(3)
+                            change = change.replace(/\./g, ',')
                             return <TableRow key={sensor["key"]}>
-                                <TableCell>{sensor["key"]}</TableCell>
-                                <TableCell><div className='flex items-stretch items-center' ><div
-                                className={`me-1 mt-5px mr-2 rounded-full h-2.5 w-2.5 flex items-center  ${(sensorInfo["status"] == "ON" ? 'bg-emerald-400' : (sensorInfo["status"] == "ERROR" ? 'bg-red-600' : 'bg-slate-300' ))}`}>
-                            </div>{sensorInfo["status"]}</div></TableCell>
-                                <TableCell>{sensorInfo["status"] == "ON" ? Number((sensorInfo["deltaMovementInMm"]).toFixed(3)): "-"}</TableCell>
+                                <TableCell className=" border text-right">{sensor["key"]}</TableCell>
+                                <TableCell className="right flex items-stretch"><div className="marginauto text-right text-right flex items-stretch">{sensorInfo["status"]}<div 
+                                className={`text-right me-1 mt-5px ml-2 rounded-full h-2.5 w-2.5 flex  ${(sensorInfo["status"] == "ON" ? 'bg-emerald-400' : (sensorInfo["status"] == "ERROR" ? 'bg-red-600' : 'bg-slate-300' ))}`}>
+                            </div></div>
+                            </TableCell>
+                                <TableCell className=" border text-right pl-0 ml-0">{sensorInfo["status"] == "ON" ? change : "-"}</TableCell>
                                 {/* <TableCell>({placement["x"]},{placement["y"]},{placement["depthInMeter"]})</TableCell> */}
-                                <TableCell>{date.toUTCString()}</TableCell>
+                                <TableCell className="border text-right">{date.toLocaleDateString("nb-NO")} kl.{date.toLocaleTimeString("nb-NO")}</TableCell>
                             </TableRow>
                         })}
                     </TableBody>
