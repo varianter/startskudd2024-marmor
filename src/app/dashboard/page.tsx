@@ -58,8 +58,7 @@ export default async function Dashboard() {
     const sensorDisplacementCount = sensorDangerSearch.count
     const sensorIsDanger = sensorDisplacementCount >= RISK_DISPLACEMENTS_COUNT_THRESHOLD;
 
-    const sensorTotalCount = 20;  // TODO
-    const sensorOkCount = 18;  // TODO (number of sensors with status='ON')
+    
 
     const sensorStatus = await client.search({
         size:0,
@@ -88,7 +87,9 @@ export default async function Dashboard() {
 
     // @ts-ignore
     const sensors = sensorStatus.aggregations?.["latest"]["buckets"]
-
+    const sensorTotalCount = sensors.length;
+    // @ts-ignore
+    const sensorOkCount = sensors.filter(elem => elem["latest"]["hits"]["hits"][0]["_source"]["status"]=="ON").length;
     // @ts-ignore
     function sortSensorsById(sensorList:any) {
         return sensorList.sort((a:any, b:any) => {
