@@ -115,7 +115,7 @@ export default async function Dashboard() {
                         {sensorIsDanger ? (
                             <TriangleAlert fill={"#DC2626"} size={50} stroke={"white"} />) : (
                             <div
-                                className={`me-1 rounded-full h-12 w-12 flex items-center justify-center ${(sensorIsDanger ? 'bg-red-600' : 'bg-emerald-400')}`}>
+                                className={`me-1 mt-3 rounded-full h-6 w-6 flex items-center justify-center ${(sensorIsDanger ? 'bg-red-600' : 'bg-emerald-400')}`}>
                             </div>
                         )}
                         <div className={"flex flex-col gap-3 mt-1"}>
@@ -131,13 +131,14 @@ export default async function Dashboard() {
                 </CardContent>
             </Card>
             <div></div>
-            <div><div className="text-base">Oversikt sensorer</div>
+            <div>
+                <div className="text-base">Oversikt sensorer</div>
                 <Table>
                     <TableHeader>
                         <TableRow>
                             <TableHead className="w-[100px] tableHeadFont">Sensornavn</TableHead>
                             <TableHead className="tableHeadFont">Status</TableHead>
-                            <TableHead className="tableHeadFont" >Siste måling (mm)</TableHead>
+                            <TableHead className="tableHeadFont" >Posisjonsendring (mm)</TableHead>
                             {/* <TableHead>Posisjon(x,y,z)</TableHead> */}
                             <TableHead className="tableHeadFont">Sist søk</TableHead>
                         </TableRow>
@@ -149,13 +150,14 @@ export default async function Dashboard() {
                             let date = new Date(sensorInfo["readingDate"])
                             return <TableRow key={sensor["key"]}>
                                 <TableCell>{sensor["key"]}</TableCell>
-                                <TableCell>{sensorInfo["status"]}</TableCell>
-                                <TableCell>{sensorInfo["status"] == "ON" ? Number((sensorInfo["deltaMovementInMm"]).toFixed(2)): "-"}</TableCell>
+                                <TableCell><div className='flex items-stretch items-center' ><div
+                                className={`me-1 mt-5px mr-2 rounded-full h-2.5 w-2.5 flex items-center  ${(sensorInfo["status"] == "ON" ? 'bg-emerald-400' : (sensorInfo["status"] == "ERROR" ? 'bg-red-600' : 'bg-slate-300' ))}`}>
+                            </div>{sensorInfo["status"]}</div></TableCell>
+                                <TableCell>{sensorInfo["status"] == "ON" ? Number((sensorInfo["deltaMovementInMm"]).toFixed(3)): "-"}</TableCell>
                                 {/* <TableCell>({placement["x"]},{placement["y"]},{placement["depthInMeter"]})</TableCell> */}
                                 <TableCell>{date.toUTCString()}</TableCell>
                             </TableRow>
                         })}
-
                     </TableBody>
                 </Table>
             </div>
