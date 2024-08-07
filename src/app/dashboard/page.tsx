@@ -85,11 +85,6 @@ export default async function Dashboard() {
         }
     })
 
-    const errorSensors = await client.search({
-        size:0,
-        index: "sensor_readings",
-
-    })
 
     // @ts-ignore
     const sensors = sensorStatus.aggregations?.["latest"]["buckets"]
