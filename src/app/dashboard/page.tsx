@@ -1,6 +1,7 @@
+"use client"
+
 import {Card, CardContent, CardTitle} from "@/components/ui/card";
 import Typography from "@/components/ui/typography";
-import { connect } from "@/elastic";
 import { TriangleAlert } from 'lucide-react';
 
 import {
@@ -12,87 +13,41 @@ import {
     TableRow,
   } from "@/components/ui/table"
 import RiskNotification from "@/app/dashboard/RiskNotification";
+import {doSensorDangerSearch, doSensorStatusSearch} from "@/actions/searchActions";
+import {useState} from "react";
+import {Switch} from "@/components/ui/switch";
+import {Badge} from "@/components/ui/badge";
+import {QueryClient, useQuery} from "@tanstack/react-query";
 
-export const revalidate = 20;
-
-
-const DELTA_MOVEMENT_THRESHOLD_MM = 5;
-const SENSOR_DEPTH_THRESHOLD_M = 1;
 const RISK_DISPLACEMENTS_COUNT_THRESHOLD = 10;
 
+const queryClient = new QueryClient();
 
-export default async function Dashboard() {
-    const client = await connect();
 
-    const sensorDangerSearch = await client.count({
-        index: "sensor_readings",
-        query: {
-            bool: {
-                must: [
-                    {
-                        range: {
-                            "deltaMovementInMm": {
-                                gt: DELTA_MOVEMENT_THRESHOLD_MM,
-                            },
-                        }
-                    },
-                    {
-                        range: {
-                            "readingPlacement.depthInMeter": {
-                                gte: SENSOR_DEPTH_THRESHOLD_M,
-                            },
-                        }
-                    },
-                    {
-                        range: {
-                            "readingDate": {
-                                gt: "now-24h",
-                            },
-                        }
-                    }
-                ]
-            }
-        },
-    })
+export default function Dashboard() {
 
-    const sensorDisplacementCount = sensorDangerSearch.count
+    const [sensorIndex, setSensorIndex] = useState<string>("sensor_readings");
+
+    const sensorDangerQuery = useQuery({queryKey: ["sensorDanger", sensorIndex], refetchInterval: 1000, queryFn: ({queryKey}) => {
+        return doSensorDangerSearch(queryKey[1])
+    }}, queryClient)
+
+    const sensorStatusQuery = useQuery({queryKey: ["sensorStatus", sensorIndex], refetchInterval: 1000, queryFn: ({queryKey}) => {
+            return doSensorStatusSearch(queryKey[1])
+        }}, queryClient)
+
+    const sensorDisplacementCount = sensorDangerQuery.data?.count ?? 0
     const sensorIsDanger = sensorDisplacementCount >= RISK_DISPLACEMENTS_COUNT_THRESHOLD;
 
-    
-
-    const sensorStatus = await client.search({
-        size:0,
-        index:"sensor_readings",
-        "aggs": {
-            "latest": {
-                "terms": {
-                    "size":100,
-                    "field": "sensorId",
-
-                },
-                "aggs": {
-                    "latest": {
-                        "top_hits": {
-                            "sort": {
-                                "readingDate":"desc",
-                            },
-                            "size": 1
-                        }
-
-                    }
-                }
-            }
-        }
-    })
-
-
     // @ts-ignore
-    const sensors = sensorStatus.aggregations?.["latest"]["buckets"]
-    const sensorTotalCount = sensors.length;
+    const sensors = sensorStatusQuery.data?.aggregations?.["latest"]["buckets"]
+    const sensorTotalCount = sensors?.length ?? 0;
     // @ts-ignore
-    const sensorOkCount = sensors.filter(elem => elem["latest"]["hits"]["hits"][0]["_source"]["status"]=="ON").length;
+    const sensorOkCount = sensors?.filter(elem => elem["latest"]["hits"]["hits"][0]["_source"]["status"]=="ON").length ?? 0;
+
     // @ts-ignore
     function sortSensorsById(sensorList:any) {
+        if (!sensorList) return sensorList;
         return sensorList.sort((a:any, b:any) => {
             const sensorIdA = parseInt(a.key.split('-')[1], 10);
             const sensorIdB = parseInt(b.key.split('-')[1], 10);
@@ -100,9 +55,6 @@ export default async function Dashboard() {
         });
     }
     const sortedBuckets = sortSensorsById(sensors)
-    // @ts-ignore
-    const sensorDangerCount = sensorDangerSearch.aggregations?.["sensors"]["buckets"].length
-
 
     return <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
 
@@ -127,9 +79,6 @@ export default async function Dashboard() {
                             <p>Dette er basert på data innhentet fra <strong>{sensorOkCount} av {sensorTotalCount}</strong> sensorer.</p>
                         </div>
                     </div>
-                    {/*<p><code className="bg-slate-200 p-1 font-mono rounded-sm">*/}
-                    {/*    {sensorDangerCount}*/}
-                    {/*</code> sensor{sensorDangerCount == 1 ? "" : "s"} detecting significant displacement</p>*/}
                 </CardContent>
             </Card>
             <div></div>
@@ -146,7 +95,7 @@ export default async function Dashboard() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {sortedBuckets.map((sensor:any) => {
+                        {sortedBuckets && sortedBuckets.map((sensor:any) => {
                             let sensorInfo = sensor["latest"]["hits"]["hits"][0]["_source"]
                             let placement = sensorInfo["sensor"]["placement"]
                             let date = new Date(sensorInfo["readingDate"])
@@ -154,7 +103,7 @@ export default async function Dashboard() {
                             change = change.replace(/\./g, ',')
                             return <TableRow key={sensor["key"]}>
                                 <TableCell className=" border text-right">{sensor["key"]}</TableCell>
-                                <TableCell className="right flex items-stretch"><div className="marginauto text-right text-right flex items-stretch">{sensorInfo["status"]}<div 
+                                <TableCell className="right flex items-stretch"><div className="marginauto text-right text-right flex items-stretch">{sensorInfo["status"]}<div
                                 className={`text-right me-1 mt-5px ml-2 rounded-full h-2.5 w-2.5 flex  ${(sensorInfo["status"] == "ON" ? 'bg-emerald-400' : (sensorInfo["status"] == "ERROR" ? 'bg-red-600' : 'bg-slate-300' ))}`}>
                             </div></div>
                             </TableCell>
@@ -166,6 +115,16 @@ export default async function Dashboard() {
                     </TableBody>
                 </Table>
             </div>
+        </div>
+        <div className={"flex justify-end"}>
+            <Badge variant={"outline"} className={"px-4 py-2"}>
+                <label className="Label" htmlFor="airplane-mode" style={{paddingRight: 15}}>
+                    Staging
+                </label>
+                <Switch onCheckedChange={(pressed) => {
+                    setSensorIndex(pressed ? "sensor_readings_staging" : "sensor_readings");
+                }}>Staging</Switch>
+            </Badge>
         </div>
     </main>;
 }

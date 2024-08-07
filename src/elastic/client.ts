@@ -2,8 +2,6 @@ import { SecretClient } from "@azure/keyvault-secrets";
 import { DefaultAzureCredential } from "@azure/identity";
 import { Client } from "@elastic/elasticsearch";
 
-export const INDEX_NAME = "sensor_readings";
-
 export type ElasticClient = Client;
 
 let client: ElasticClient | null = null;

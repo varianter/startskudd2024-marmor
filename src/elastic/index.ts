@@ -1,4 +1,4 @@
-import { connect, INDEX_NAME } from "./client";
+import { connect } from "./client";
 export * from "./client";
 
 type ConnectionInfoReturn =
